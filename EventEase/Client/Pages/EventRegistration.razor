@@ -1,0 +1,69 @@
+﻿@page "/register"
+@using EventEase.Client.Models
+@using EventEase.Services
+@inject EventService EventService
+@inject NavigationManager NavigationManager
+@inject UserSessionService UserSessionService
+
+
+@if (UserSessionService.IsSessionActive())
+{
+
+
+    <div class="container d-flex justify-content-center align-items-center" style="height: 30vh;">
+        <div class="w-50">
+            <h3>Event Registration</h3>
+
+            @if (!string.IsNullOrEmpty(successMessage))
+            {
+                <div class="alert alert-success" role="alert">
+                    @successMessage
+                </div>
+            }
+
+            <EditForm Model="@eventModel" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-3">
+                    <label for="name">Event Name:</label>
+                    <InputText id="name" class="form-control w-75" @bind-Value="eventModel.Name" />
+                    <ValidationMessage For="@(() => eventModel.Name)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="date">Event Date:</label>
+                    <InputDate id="date" class="form-control w-75" @bind-Value="eventModel.Date" />
+                    <ValidationMessage For="@(() => eventModel.Date)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="location">Event Location:</label>
+                    <InputText id="location" class="form-control w-75" @bind-Value="eventModel.Location" />
+                    <ValidationMessage For="@(() => eventModel.Location)" />
+                </div>
+
+                <button type="submit" class="btn btn-success mt-3">Register Event</button>
+            </EditForm>
+        </div>
+    </div>
+
+}
+else
+{
+    <p>Please <a href="/registeruser">register a user</a> to create an event.</p>
+}
+
+
+@code {
+    private Event eventModel = new Event();
+    private string successMessage;
+
+    private void HandleValidSubmit()
+    {
+        successMessage = "Event registered successfully!";
+        EventService.AddEvent(eventModel);
+        EventService.RegisterAttendance(eventModel.Id, UserSessionService.UserName);
+        NavigationManager.NavigateTo("/events");
+    }
+}

@@ -1,0 +1,41 @@
+﻿@page "/attendance/{eventId:int}"
+@using EventEase.Client.Models
+@using EventEase.Services
+@inject EventService EventService
+@inject NavigationManager NavigationManager
+
+<h3>Attendance Tracker</h3>
+
+@if (Event != null)
+{
+    <div>
+        <h2>@Event.Name</h2>
+        <p>Date: @Event.Date.ToString("MMMM dd, yyyy")</p>
+        <p>Location: @Event.Location</p>
+        <h4>Attendees:</h4>
+        <ul>
+            @foreach (var attendee in Attendees)
+            {
+                <li>@attendee</li>
+            }
+        </ul>
+    </div>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    private Event Event;
+    private List<string> Attendees = new List<string>();
+
+    protected override void OnInitialized()
+    {
+        Event = EventService.GetEventById(EventId);
+        Attendees = EventService.GetAttendees(EventId);
+    }
+}

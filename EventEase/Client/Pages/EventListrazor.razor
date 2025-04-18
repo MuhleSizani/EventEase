@@ -1,0 +1,40 @@
+﻿@page "/events"
+@using EventEase.Client.Models;
+@using EventEase.Services;
+@inject EventService EventService
+
+
+
+<h3>Event List</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Location</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var eventItem in Events)
+        {
+            <tr>
+                <td>@eventItem.Name</td>
+                <td>@eventItem.Date.ToString("MMMM dd, yyyy")</td>
+                <td>@eventItem.Location</td>
+                <td><a href="/eventdetails/@eventItem.Id">View Details</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+
+    private List<Event> Events = new List<Event>();
+
+    protected override void OnInitialized()
+    {
+        Events = EventService.GetEvents();
+    }
+
+}

@@ -1,0 +1,38 @@
+﻿@page "/eventcard"
+@using EventEase.Services
+@using EventEase.Client.Models
+@inject EventService EventService
+
+<div class="event-list">
+    @foreach (var eventItem in PagedEvents)
+    {
+        <div class="event-card">
+            <h2>@eventItem.Name</h2>
+            <p>Date: @eventItem.Date.ToString("MMMM dd, yyyy")</p>
+            <p>Location: @eventItem.Location</p>
+        </div>
+    }
+</div>
+
+<button @onclick="LoadMore">Load More</button>
+
+@code {
+    [Parameter]
+    public List<Event> Events { get; set; } = new List<Event>();
+    private List<Event> PagedEvents = new List<Event>();
+    private int PageSize = 5;
+    private int PageNumber = 1;
+
+    protected override void OnInitialized()
+    {
+        Events = EventService.GetEvents();
+        LoadMore();
+    }
+
+    private void LoadMore()
+    {
+        var nextPage = Events.Skip((PageNumber - 1) * PageSize).Take(PageSize).ToList();
+        PagedEvents.AddRange(nextPage);
+        PageNumber++;
+    }
+}
